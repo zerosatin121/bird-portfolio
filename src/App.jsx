@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import Home from './pages/Home';
+import Gallery from './pages/Gallery';
+import BirdDetail from './pages/BirdDetail';
+import Events from './pages/Events';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Admin from './pages/Admin';
+import { pageVariants, pageTransition } from './lib/animations';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function PageWrapper({ children }) {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="min-h-screen"
+    >
+      {children}
+    </motion.div>
+  );
 }
 
-export default App
+function App() {
+  const location = useLocation();
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background text-text">
+      <Navbar />
+
+      <main className="flex-grow">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+            <Route path="/gallery" element={<PageWrapper><Gallery /></PageWrapper>} />
+            <Route path="/bird/:slug" element={<PageWrapper><BirdDetail /></PageWrapper>} />
+            <Route path="/events" element={<PageWrapper><Events /></PageWrapper>} />
+            <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+            <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+            <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
+          </Routes>
+        </AnimatePresence>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
