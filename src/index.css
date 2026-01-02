@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f0f5ed;
+  --color-primary-100: #dae8d2;
+  --color-primary-200: #b8d3a8;
+  --color-primary-300: #90ba77;
+  --color-primary-400: #6ea14d;
+  --color-primary-500: #2D5016;
+  --color-primary-600: #254112;
+  --color-primary-700: #1d330e;
+  --color-primary-800: #16260b;
+  --color-primary-900: #0f1a08;
+
+  --color-secondary: #8B7355;
+  --color-accent: #D4A574;
+  --color-background: #FDFBF7;
+  --color-text: #1A1A1A;
+  --color-muted: #A8A29E;
+
+  --font-display: "Playfair Display", serif;
+  --font-body: "Lora", serif;
+  --font-sans: "DM Sans", sans-serif;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+  }
+
+  --animate-fade-in: fade-in 0.5s ease-in;
+  --animate-slide-up: slide-up 0.5s ease-out;
+  --animate-shimmer: shimmer 2s infinite;
+}
+
+/* Custom CSS Variables for easier access */
+:root {
+  --primary: var(--color-primary-500);
+  --secondary: var(--color-secondary);
+  --accent: var(--color-accent);
+  --background: var(--color-background);
+  --text: var(--color-text);
+  --muted: var(--color-muted);
+}
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+body {
+  @apply bg-background text-text font-body;
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display;
+}
+
+.font-sans {
+  @apply font-sans;
+}
