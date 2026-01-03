@@ -52,12 +52,6 @@ export default function Navbar() {
                             {link.name}
                         </Link>
                     ))}
-                    <Link
-                        to="/admin"
-                        className="px-4 py-2 border border-primary-200 text-xs tracking-widest uppercase rounded-full hover:bg-primary-50 transition-colors"
-                    >
-                        Admin
-                    </Link>
                 </div>
 
                 {/* Mobile Toggle */}
@@ -89,12 +83,6 @@ export default function Navbar() {
                                     {link.name}
                                 </Link>
                             ))}
-                            <Link
-                                to="/admin"
-                                className="text-primary-500 font-bold"
-                            >
-                                Admin Panel
-                            </Link>
                         </div>
                     </motion.div>
                 )}

@@ -60,7 +60,7 @@ export default function Gallery() {
                 </header>
 
                 {/* Filter Bar */}
-                <div className="flex flex-col md:row gap-6 mb-12 items-center justify-between border-b border-primary-50 pb-8">
+                <div className="flex flex-col md:flex-row gap-6 mb-12 items-center justify-between border-b border-primary-50 pb-8">
                     <div className="relative w-full md:max-w-md">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={18} />
                         <input
@@ -78,8 +78,8 @@ export default function Gallery() {
                                 key={tag}
                                 onClick={() => setSelectedTag(tag)}
                                 className={`px-6 py-2 rounded-full text-[10px] font-sans tracking-widest uppercase font-bold transition-all whitespace-nowrap ${selectedTag === tag
-                                        ? 'bg-primary-500 text-white shadow-md'
-                                        : 'bg-white text-muted border border-primary-50 hover:border-primary-200'
+                                    ? 'bg-primary-500 text-white shadow-md'
+                                    : 'bg-white text-muted border border-primary-50 hover:border-primary-200'
                                     }`}
                             >
                                 {tag}
@@ -128,4 +128,3 @@ export default function Gallery() {
         </div>
     );
 }
-import { AnimatePresence } from 'framer-motion';

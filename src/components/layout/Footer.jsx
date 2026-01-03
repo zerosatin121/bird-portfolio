@@ -48,7 +48,6 @@ export default function Footer() {
                 <div className="border-t border-primary-800 pt-8 flex flex-col md:row justify-between items-center gap-4 text-primary-300 text-xs tracking-widest uppercase">
                     <p>© {new Date().getFullYear()} Bird Watching Portfolio. Built with passion.</p>
                     <div className="flex gap-8">
-                        <Link to="/admin" className="hover:text-white transition-colors">Admin Login</Link>
                         <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
                     </div>
                 </div>

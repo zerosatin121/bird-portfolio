@@ -1,17 +1,51 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { X, Save, Calendar, MapPin, Bird, Info } from 'lucide-react';
+import { X, Save, Calendar, MapPin, Bird, Info, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { useStorage } from '../../hooks/useStorage';
 
 export default function EventForm({ event, birds, onSubmit, onCancel }) {
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { uploadImage, uploading } = useStorage();
+    const [previewUrl, setPreviewUrl] = useState(event?.images?.[0]?.url || '');
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const { register, handleSubmit, watch, formState: { errors } } = useForm({
         defaultValues: event || {
             title: '',
             event_date: new Date().toISOString().split('T')[0],
             location_name: '',
             description: '',
             bird_species_spotted: [],
-            images: []
+            images: [{ url: '', caption: 'Main expedition photo' }]
         }
     });
+
+    const thumbnailUrl = watch('images.0.url');
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const onFormSubmit = async (data) => {
+        let finalImageUrl = data.images?.[0]?.url;
+
+        if (selectedFile) {
+            const uploadedUrl = await uploadImage(selectedFile, 'events'); // Upload to events bucket
+            if (uploadedUrl) {
+                finalImageUrl = uploadedUrl;
+            }
+        }
+
+        const formattedData = {
+            ...data,
+            images: [{ url: finalImageUrl, caption: 'Main expedition photo' }]
+        };
+
+        onSubmit(formattedData);
+    };
 
     return (
         <div className="bg-white rounded-[40px] p-8 md:p-12 border border-primary-50">
@@ -30,7 +64,7 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
                     <div>
                         <label className="block text-[10px] font-sans tracking-widest uppercase font-bold text-muted mb-2 ml-1">Expedition Title</label>
@@ -93,16 +127,42 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-[10px] font-sans tracking-widest uppercase font-bold text-muted mb-2 ml-1 flex items-center gap-2">
-                            <Info size={12} />
-                            Featured Image URL
-                        </label>
-                        <input
-                            {...register('images.0.url')}
-                            className="w-full bg-primary-50 rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-primary-100 outline-none text-sm font-body"
-                            placeholder="https://images.unsplash.com/..."
-                        />
+                    <div className="space-y-4">
+                        <label className="block text-[10px] font-sans tracking-widest uppercase font-bold text-muted mb-2 ml-1">Expedition Imagery</label>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {/* Preview Area */}
+                            <div className="aspect-video rounded-2xl bg-primary-50 border-2 border-dashed border-primary-100 flex items-center justify-center overflow-hidden relative group">
+                                {previewUrl || thumbnailUrl ? (
+                                    <>
+                                        <img src={previewUrl || thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <p className="text-white text-[10px] font-sans uppercase tracking-widest font-bold">Image Preview</p>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="text-center p-6">
+                                        <ImageIcon className="mx-auto mb-2 text-primary-200" size={32} />
+                                        <p className="text-[9px] text-muted font-sans uppercase tracking-[0.2em]">No image selected</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Upload/URL Choice */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <label className="flex items-center justify-center gap-3 flex-1 px-6 py-4 bg-primary-100/50 text-primary-700 rounded-2xl cursor-pointer hover:bg-primary-100 transition-all border border-primary-200 border-dashed">
+                                    <Upload size={18} />
+                                    <span className="text-[10px] font-sans tracking-widest uppercase font-bold text-center">Upload File</span>
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                </label>
+
+                                <input
+                                    {...register('images.0.url')}
+                                    className="flex-[2] bg-primary-50 rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-primary-100 outline-none text-xs font-body"
+                                    placeholder="...or external URL"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -111,15 +171,26 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
                         type="button"
                         onClick={onCancel}
                         className="px-8 py-4 text-muted font-sans text-[10px] tracking-widest uppercase font-bold hover:text-red-500 transition-colors"
+                        disabled={uploading}
                     >
                         Discard Log
                     </button>
                     <button
                         type="submit"
-                        className="px-10 py-4 bg-secondary text-white rounded-full font-sans text-[10px] tracking-widest uppercase font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl"
+                        disabled={uploading}
+                        className="px-10 py-4 bg-secondary text-white rounded-full font-sans text-[10px] tracking-widest uppercase font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl disabled:opacity-50"
                     >
-                        <Save size={14} />
-                        Seal Expedition Log
+                        {uploading ? (
+                            <>
+                                <Loader2 size={14} className="animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            <>
+                                <Save size={14} />
+                                Seal Expedition Log
+                            </>
+                        )}
                     </button>
                 </div>
             </form>
