@@ -1,7 +1,18 @@
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { heroContainer, heroItem, staggerContainer, fadeInItem } from '../lib/animations';
 import { ArrowRight, Bird, Binoculars, Map, Camera } from 'lucide-react';
+
+const BACKGROUND_IMAGES = [
+    "https://images.unsplash.com/photo-1486365227551-f3f90034a57c?auto=format&fit=crop&q=80&w=1920",
+    "https://images.unsplash.com/photo-1555169062-013468b47731?auto=format&fit=crop&q=80&w=1920",
+    "https://images.unsplash.com/photo-1551085254-e96b210db58a?auto=format&fit=crop&q=80&w=1920",
+    "https://images.unsplash.com/photo-1497206365907-f5e630693df0?auto=format&fit=crop&q=80&w=1920",
+    "https://images.unsplash.com/photo-1539664030485-a936c7d29c6e?auto=format&fit=crop&q=80&w=1920",
+    "https://images.unsplash.com/photo-1504579264001-833438f93df2?auto=format&fit=crop&q=80&w=1920",
+    "https://images.unsplash.com/photo-1534566991776-92e46728f72d?auto=format&fit=crop&q=80&w=1920"
+];
 
 const stats = [
     { icon: <Binoculars size={24} />, label: "Species Observed", value: "150+", color: "bg-primary-50 text-primary-600" },
@@ -10,14 +21,35 @@ const stats = [
 ];
 
 export default function Home() {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
+        }, 3000); // Change image every 3 seconds
+        return () => clearInterval(timer);
+    }, []);
+
     return (
         <div className="flex flex-col min-h-screen">
             {/* Hero Section */}
             <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-                {/* Background Decor */}
-                <div className="absolute inset-0 -z-10 bg-background">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-50 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary-100 rounded-full blur-3xl opacity-30 translate-y-1/2 -translate-x-1/2" />
+                {/* Dynamic Background Slideshow */}
+                <div className="absolute inset-0 -z-10 bg-primary-900">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={BACKGROUND_IMAGES[currentImageIndex]}
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ opacity: 0.4, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ backgroundImage: `url(${BACKGROUND_IMAGES[currentImageIndex]})` }}
+                        />
+                    </AnimatePresence>
+                    {/* Artistic Gradients */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                 </div>
 
                 <div className="container mx-auto px-6 py-20 mt-16">
