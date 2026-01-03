@@ -35,12 +35,12 @@ export default function Home() {
             {/* Hero Section */}
             <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
                 {/* Dynamic Background Slideshow */}
-                <div className="absolute inset-0 -z-10 bg-primary-900">
+                <div className="absolute inset-0 z-0 bg-primary-900">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={BACKGROUND_IMAGES[currentImageIndex]}
                             initial={{ opacity: 0, scale: 1.1 }}
-                            animate={{ opacity: 0.4, scale: 1 }}
+                            animate={{ opacity: 0.6, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 1.5, ease: "easeOut" }}
                             className="absolute inset-0 bg-cover bg-center"
@@ -52,7 +52,7 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                 </div>
 
-                <div className="container mx-auto px-6 py-20 mt-16">
+                <div className="container mx-auto px-6 py-20 mt-16 relative z-10">
                     <motion.div
                         variants={heroContainer}
                         initial="hidden"
