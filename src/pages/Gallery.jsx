@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBirds } from '../hooks/useBirds';
 import BirdCard from '../components/gallery/BirdCard';
 import { staggerContainer, fadeInItem } from '../lib/animations';
@@ -20,9 +20,9 @@ export default function Gallery() {
 
     const filteredBirds = useMemo(() => {
         return birds.filter(bird => {
-            const matchesSearch = bird.english_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                bird.local_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                bird.scientific_name.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearch = (bird.english_name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                (bird.local_name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                (bird.scientific_name?.toLowerCase() || '').includes(searchQuery.toLowerCase());
             const matchesTag = selectedTag === 'All' || bird.tags?.includes(selectedTag);
             return matchesSearch && matchesTag;
         });

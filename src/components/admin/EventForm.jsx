@@ -21,6 +21,9 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
 
     const thumbnailUrl = watch('images.0.url');
 
+    // Use selected file preview if available, otherwise use external URL
+    const displayUrl = selectedFile ? previewUrl : thumbnailUrl;
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -33,9 +36,15 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
         let finalImageUrl = data.images?.[0]?.url;
 
         if (selectedFile) {
+            console.log('Starting file upload for event:', selectedFile.name);
             const uploadedUrl = await uploadImage(selectedFile, 'events'); // Upload to events bucket
             if (uploadedUrl) {
+                console.log('Upload successful! URL:', uploadedUrl);
                 finalImageUrl = uploadedUrl;
+            } else {
+                console.error('File upload failed. Check storage policies.');
+                alert('Image upload failed. Please ensure your Supabase storage bucket "events" is public and has "INSERT" policies enabled.');
+                return; // Stop the save process if upload failed
             }
         }
 
@@ -133,9 +142,9 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
                         <div className="grid grid-cols-1 gap-4">
                             {/* Preview Area */}
                             <div className="aspect-video rounded-2xl bg-primary-50 border-2 border-dashed border-primary-100 flex items-center justify-center overflow-hidden relative group">
-                                {previewUrl || thumbnailUrl ? (
+                                {displayUrl ? (
                                     <>
-                                        <img src={previewUrl || thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <img src={displayUrl} alt="Preview" className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <p className="text-white text-[10px] font-sans uppercase tracking-widest font-bold">Image Preview</p>
                                         </div>
@@ -156,11 +165,20 @@ export default function EventForm({ event, birds, onSubmit, onCancel }) {
                                     <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                                 </label>
 
-                                <input
-                                    {...register('images.0.url')}
-                                    className="flex-[2] bg-primary-50 rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-primary-100 outline-none text-xs font-body"
-                                    placeholder="...or external URL"
-                                />
+                                <div className="space-y-2 flex-[2]">
+                                    <input
+                                        {...register('images.0.url')}
+                                        className={`w-full bg-primary-50 rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-primary-100 outline-none text-xs font-body ${thumbnailUrl?.includes('unsplash.com/photos') ? 'ring-2 ring-amber-500 bg-amber-50' : ''
+                                            }`}
+                                        placeholder="...or external URL"
+                                    />
+                                    {thumbnailUrl?.includes('unsplash.com/photos') && (
+                                        <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-800 rounded-xl text-[10px] font-sans tracking-widest uppercase font-bold animate-pulse">
+                                            <Info size={12} />
+                                            Warning: This is a webpage link. Right-click the image and select "Copy Image Address" instead.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

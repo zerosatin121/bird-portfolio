@@ -33,18 +33,35 @@ ALTER TABLE public.birds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 
 -- 4. Create Policies (Public Read Access)
+DROP POLICY IF EXISTS "Public birds are viewable by everyone" ON public.birds;
 CREATE POLICY "Public birds are viewable by everyone" ON public.birds
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Public events are viewable by everyone" ON public.events;
 CREATE POLICY "Public events are viewable by everyone" ON public.events
     FOR SELECT USING (true);
 
--- 5. Create Policies (Admin Full Access - Using Service Role or simple true for this demo)
--- NOTE: In a production app, you'd restrict this to authenticated users.
--- For now, we will allow all operations to simplify your local testing.
+-- 5. Create Policies (Admin Full Access)
+DROP POLICY IF EXISTS "Enable all for everyone" ON public.birds;
 CREATE POLICY "Enable all for everyone" ON public.birds FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Enable all for everyone" ON public.events;
 CREATE POLICY "Enable all for everyone" ON public.events FOR ALL USING (true);
 
 -- 6. Storage Setup
--- Run these in your Supabase Dashboard under "Storage"
--- Create two public buckets: "birds" and "events"
+-- IMPORTANT: You must first go to the "Storage" tab in the Supabase Dashboard
+-- and create two public buckets named: birds and events
+
+-- Allow Public Access to 'birds' and 'events' buckets
+-- Note: RLS is usually enabled by default on storage via the UI.
+CREATE POLICY "Public Access" ON storage.objects
+    FOR SELECT USING (bucket_id IN ('birds', 'events'));
+
+CREATE POLICY "Public Upload" ON storage.objects
+    FOR INSERT WITH CHECK (bucket_id IN ('birds', 'events'));
+
+CREATE POLICY "Public Update" ON storage.objects
+    FOR UPDATE USING (bucket_id IN ('birds', 'events'));
+
+CREATE POLICY "Public Delete" ON storage.objects
+    FOR DELETE USING (bucket_id IN ('birds', 'events'));

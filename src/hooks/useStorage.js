@@ -16,17 +16,22 @@ export const useStorage = () => {
             const filePath = `${fileName}`;
 
             // Upload the file
+            console.log(`Uploading to bucket: ${bucket}, path: ${filePath}`);
             const { error: uploadError } = await supabase.storage
                 .from(bucket)
                 .upload(filePath, file);
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                console.error('Supabase Storage Upload Error:', uploadError);
+                throw uploadError;
+            }
 
             // Get public URL
             const { data: { publicUrl } } = supabase.storage
                 .from(bucket)
                 .getPublicUrl(filePath);
 
+            console.log('Generated Public URL:', publicUrl);
             return publicUrl;
         } catch (err) {
             console.error('Error uploading image:', err);

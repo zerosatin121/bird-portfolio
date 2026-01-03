@@ -37,9 +37,15 @@ export default function BirdForm({ bird, onSubmit, onCancel }) {
         let finalThumbnail = data.thumbnail;
 
         if (selectedFile) {
+            console.log('Starting file upload for:', selectedFile.name);
             const uploadedUrl = await uploadImage(selectedFile);
             if (uploadedUrl) {
+                console.log('Upload successful! URL:', uploadedUrl);
                 finalThumbnail = uploadedUrl;
+            } else {
+                console.error('File upload failed. Check storage policies.');
+                alert('Image upload failed. Please ensure your Supabase storage buckets "birds" and "events" are public and have "INSERT" policies enabled.');
+                return; // Stop the save process if upload failed
             }
         }
 
@@ -171,11 +177,20 @@ export default function BirdForm({ bird, onSubmit, onCancel }) {
                                 </div>
 
                                 <div className="relative">
-                                    <input
-                                        {...register('thumbnail')}
-                                        className="w-full bg-primary-50 rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-primary-100 outline-none text-xs font-body"
-                                        placeholder="...or paste an external URL"
-                                    />
+                                    <div className="space-y-2 flex-[2]">
+                                        <input
+                                            {...register('thumbnail')}
+                                            className={`w-full bg-primary-50 rounded-2xl px-6 py-4 border-none focus:ring-2 focus:ring-primary-100 outline-none text-xs font-body ${thumbnailUrl?.includes('unsplash.com/photos') ? 'ring-2 ring-amber-500 bg-amber-50' : ''
+                                                }`}
+                                            placeholder="...or external URL"
+                                        />
+                                        {thumbnailUrl?.includes('unsplash.com/photos') && (
+                                            <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-800 rounded-xl text-[10px] font-sans tracking-widest uppercase font-bold animate-pulse">
+                                                <Info size={12} />
+                                                Warning: This is a webpage link. Right-click the image and select "Copy Image Address" instead.
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

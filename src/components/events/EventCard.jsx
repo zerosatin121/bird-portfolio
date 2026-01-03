@@ -3,11 +3,14 @@ import { MapPin, Calendar, Bird, Info } from 'lucide-react';
 import { cardVariants } from '../../lib/animations';
 
 export default function EventCard({ event }) {
-    const formattedDate = new Date(event.event_date).toLocaleDateString('en-US', {
+    const dateObj = event.event_date ? new Date(event.event_date) : new Date();
+    const isValidDate = !isNaN(dateObj.getTime());
+
+    const formattedDate = isValidDate ? dateObj.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
-    });
+    }) : 'Date Unknown';
 
     return (
         <motion.div
@@ -27,10 +30,10 @@ export default function EventCard({ event }) {
                     />
                     <div className="absolute top-6 left-6 flex flex-col items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg border border-primary-50">
                         <span className="text-secondary font-display font-bold text-xl leading-none">
-                            {new Date(event.event_date).getDate()}
+                            {isValidDate ? dateObj.getDate() : '?'}
                         </span>
                         <span className="text-[10px] font-sans tracking-widest uppercase font-bold text-muted">
-                            {new Date(event.event_date).toLocaleString('default', { month: 'short' })}
+                            {isValidDate ? dateObj.toLocaleString('default', { month: 'short' }) : '---'}
                         </span>
                     </div>
                 </div>
